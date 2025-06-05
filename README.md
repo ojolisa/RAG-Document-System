@@ -471,10 +471,6 @@ print(cursor.fetchall())
 5. Run the test suite
 6. Submit a pull request
 
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
 ## 🆘 Support
 
 If you encounter any issues or have questions:
