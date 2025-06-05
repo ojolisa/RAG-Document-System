@@ -1,0 +1,26 @@
+version: '3.8'
+
+# Development override for docker-compose.yml
+# Use with: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev.api
+    volumes:
+      # Mount source code for hot reload
+      - ./api:/app/api
+      - ./rag:/app/rag
+      - ./__init__.py:/app/__init__.py
+      # Persistent data
+      - ./api/documents.db:/app/api/documents.db
+      - ./rag/pdfs:/app/rag/pdfs
+      - ./rag/embeddings.pkl:/app/rag/embeddings.pkl
+      - ./rag/faiss_index.bin:/app/rag/faiss_index.bin
+    command: ["python", "-m", "uvicorn", "api.api:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    
+  frontend:
+    volumes:
+      # Mount frontend files for development
+      - ./frontend:/app/frontend
