@@ -273,14 +273,21 @@
             margin-bottom: 12px;
             border-radius: 8px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .document-item:hover {
             border-color: #3b82f6;
-            transform: translateX(8px);
             background: rgba(59, 130, 246, 0.1);
+        }
+
+        .document-content {
+            cursor: pointer;
+        }
+
+        .document-content:hover {
+            transform: translateX(8px);
         }
 
         .document-name {
@@ -293,6 +300,58 @@
             font-size: 13px;
             color: #94a3b8;
             margin-top: 6px;
+        }
+
+        .document-actions {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-delete::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-delete:hover::before {
+            opacity: 1;
+        }
+
+        .btn-delete:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-delete>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-delete:disabled {
+            background: rgba(100, 116, 139, 0.5);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .sources {
@@ -602,9 +661,7 @@
                 `;
                 sourcesEl.innerHTML = '';
             }
-        }
-
-        async function loadDocuments() {
+        } async function loadDocuments() {
             try {
                 const response = await fetch(`${API_BASE}/documents`);
                 const data = await response.json();
@@ -618,10 +675,17 @@
                         const fileSize = (doc.file_size / 1024).toFixed(1);
 
                         documentsHtml += `
-                            <div class="document-item" onclick="showDocumentDetails(${doc.id})">
-                                <div class="document-name">${doc.original_name}</div>
-                                <div class="document-info">
-                                    ${fileSize} KB • ${doc.total_chunks} chunks • ${uploadDate} • ${doc.status}
+                            <div class="document-item">
+                                <div class="document-actions">
+                                    <button class="btn-delete" onclick="deleteDocument(${doc.id}, '${doc.original_name}')" title="Delete document">
+                                        🗑️ Delete
+                                    </button>
+                                </div>
+                                <div class="document-content" onclick="showDocumentDetails(${doc.id})">
+                                    <div class="document-name">${doc.original_name}</div>
+                                    <div class="document-info">
+                                        ${fileSize} KB • ${doc.total_chunks} chunks • ${uploadDate} • ${doc.status}
+                                    </div>
                                 </div>
                             </div>
                         `;
@@ -642,7 +706,35 @@
             document.getElementById('queryResponse').style.display = 'none';
             document.getElementById('answerSection').innerHTML = '';
             document.getElementById('sourcesSection').innerHTML = '';
-        } function showDocumentDetails(documentId) {
+        } async function deleteDocument(documentId, documentName) {
+            // Confirm deletion
+            if (!confirm(`Are you sure you want to delete "${documentName}"?\n\nThis action cannot be undone and will remove the document from the knowledge base.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/documents/${documentId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Show success message
+                    alert(`✅ Document "${documentName}" has been deleted successfully!`);
+
+                    // Refresh the documents list
+                    loadDocuments();
+                } else {
+                    // Show error message
+                    alert(`❌ Error deleting document: ${data.error || 'Unknown error'}`);
+                }
+            } catch (error) {
+                alert(`❌ Network error: ${error.message}`);
+            }
+        }
+
+        function showDocumentDetails(documentId) {
             // Simple implementation - just show an alert with document ID
             // You could expand this to show a modal with full document details
             alert(`Document ID: ${documentId}\nClick OK to continue.\n\nYou can expand this to show detailed document information.`);
