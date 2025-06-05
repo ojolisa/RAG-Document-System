@@ -1,0 +1,13 @@
+google-generativeai
+faiss-cpu
+sentence-transformers
+PyPDF2
+python-dotenv
+numpy
+langchain
+langchain-community
+tiktoken
+fastapi
+uvicorn[standard]
+sqlalchemy
+python-multipart

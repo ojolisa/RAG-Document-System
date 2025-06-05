@@ -1,0 +1,23 @@
+# Virtual environments
+venv/
+.venv/
+
+# Environment variables
+.env
+
+# Batch files
+*.bat
+
+# Python cache
+__pycache__/
+
+# Embeddings
+embeddings.pkl
+*.embeddings
+
+# FAISS index files
+faiss_index.bin
+*.faiss
+
+# Database files
+*.db
