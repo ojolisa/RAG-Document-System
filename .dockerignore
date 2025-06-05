@@ -5,8 +5,3 @@ __pycache__/
 .pytest_cache/
 .coverage
 htmlcov/
-
-# Data files (optional - uncomment if you don't want to persist data)
-# rag/faiss_index.bin
-# rag/embeddings.pkl
-# documents.db
